@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        function updateNumbersList(numbers) {
+            $("#numbersList").empty();
+            numbers.forEach(function (number) {
+                $("#numbersList").append("<span>" + number + "</span>" + "   ");
+            });
+            $("#numbersCount").text(numbers.length);
+        }
+
+        function updateNumbersSum(sum) {
+            if (sum !== 0) {
+                $("#numbersSum").text(sum);
+            }
+            else {
+                $("#numbersSum").text("Not summed");
+            }
+        }
+
+        $("#btnClear").click(function () {
+            $.ajax({
+                type: "POST",
+                url: "/Home/ClearNumbers",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    updateNumbersList(response.numbers);
+                    updateNumbersSum(response.sum);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        $("#btnAdd").click(function () {
+            $.ajax({
+                type: "POST",
+                url: "/Home/AddNumber",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    updateNumbersList(response.numbers);
+                    updateNumbersSum(response.sum);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        $("#btnSum").click(function () {
+            $.ajax({
+                type: "POST",
+                url: "/Home/SumNumbers",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    updateNumbersSum(response);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>
+
+<div>
+    <h1>Header</h1>
+    <h3>Subheader</h3>
+    <div>
+        <input id="btnClear" type="button" value="Clear Numbers" />
+        <input id="btnAdd" type="button" value="Add Number" />
+        <input id="btnSum" type="button" value="Sum Numbers" />
+    </div>
+    <br />
+    <div>
+        <div id="numbersList">
+            @foreach (var number in @ViewBag.Numbers ?? Enumerable.Empty<int>())
+            {
+                <span>@number  </span>
+            }
+
+        </div>
+    </div>
+    <br />
+    <div>
+        <p class="bold">Count: <span id="numbersCount">@(ViewBag.Numbers?.Count ?? 0)</span></p>
+        <p class="bold">Sum: <span id="numbersSum">@(ViewBag.IsSummed is null ? "Not summed" : ViewBag.Sum)</span></p>
+    </div>
+</div>
